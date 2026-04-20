@@ -1,0 +1,70 @@
+# =============================================================================
+# Casanovo Configuration — E. coli Vesicle Proteomics Project
+# Reference: Group 10 — Peptide and Protein Sequencing by Multinomial Diffusion Model
+# University at Buffalo, Spring 2026
+# =============================================================================
+# These hyperparameters match Table 1 in the project report (casanovo/config.yaml).
+
+# --------------- Model Architecture ----------------------------------------
+dim_model: 512          # Embedding dimension for encoder and decoder
+n_head: 8               # Number of multi-head attention heads
+dim_feedforward: 1024   # Feed-forward sublayer dimension
+n_layers: 9             # Number of transformer layers (encoder + decoder each)
+dropout: 0.0            # Dropout disabled — large pre-training corpus regularises
+
+# --------------- Training ---------------------------------------------------
+learning_rate: 5.0e-4         # Peak learning rate (linear warm-up → cosine decay)
+weight_decay: 1.0e-5          # L2 regularisation weight
+train_label_smoothing: 0.01   # Prevents overconfident residue predictions
+warmup_iters: 100000          # Linear LR warm-up iterations
+cosine_schedule_period_iters: 600000  # Cosine annealing period (smooth convergence)
+max_epochs: 30                # Maximum training epochs
+train_batch_size: 32          # Batch size during training
+
+# --------------- Inference --------------------------------------------------
+predict_batch_size: 1024      # Spectra processed per inference batch
+n_beams: 1                    # Beam-search width (1 = greedy decoding for speed)
+top_match: 1                  # Top-N sequences to report per spectrum
+
+# --------------- Spectrum Pre-processing ------------------------------------
+precursor_mass_tol: 50        # Precursor mass tolerance (ppm) for beam-search termination
+isotope_error_range: [0, 1]   # Isotope error range to consider
+min_peptide_len: 6            # Minimum predicted peptide length
+max_peptide_len: 100          # Maximum predicted peptide length
+max_charge: 10                # Maximum precursor charge state
+
+# --------------- Residue/PTM Vocabulary ------------------------------------
+# Standard 20 amino acids + common modifications
+residues:
+  G: 57.02146
+  A: 71.03711
+  S: 87.03203
+  P: 97.05276
+  V: 99.06841
+  T: 101.04768
+  C: 103.00919
+  I: 113.08406
+  L: 113.08406
+  N: 114.04293
+  D: 115.02694
+  Q: 128.05858
+  K: 128.09496
+  E: 129.04259
+  M: 131.04049
+  H: 137.05891
+  F: 147.06841
+  R: 156.10111
+  Y: 163.06333
+  W: 186.07931
+  # Post-translational modifications
+  "+42.011":  42.01057   # Acetylation (N-term)
+  "+43.006":  43.00581   # Carbamylation
+  "-17.027": -17.02655   # Ammonia loss
+  "+43.006":  43.00581   # Carbamylation
+  "M+15.995": 147.03554  # Oxidation of Met
+  "C+57.021": 160.03065  # Carbamidomethyl-Cys (fixed mod in most LC-MS/MS)
+
+# --------------- Output Formatting -----------------------------------------
+# Output will be written as mzTab (.mztab) — contains:
+#   PSM rows: sequence, scan_id, aa_scores, charge, exp_mass_to_charge
+random_seed: 42

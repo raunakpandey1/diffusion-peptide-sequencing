@@ -1,0 +1,2 @@
+sample,aa_precision,aa_recall,aa_accuracy,aa_f1,peptide_precision,peptide_recall,peptide_accuracy,peptide_f1
+EV2,0.937422,0.934206,0.930531,0.935811,0.731449,0.375453,0.329968,0.496205
